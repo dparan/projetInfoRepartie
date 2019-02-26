@@ -3,21 +3,16 @@ package org.ir.agents.compteur;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.lang.ClassNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class AgentCompteur {
+public class App {
 
-    final static Compteur compteur = new Compteur();
+    final static Compteur compteurText = new Compteur();
+    final static Compteur compteurImage = new Compteur();
     private static Runnable serveur = new Runnable() {
-
+//
         @Override
         public void run() {
             try {
@@ -28,15 +23,28 @@ public class AgentCompteur {
                     BufferedReader in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
                     String str = in.readLine();
                     switch (str) {
-                        case "inc":
-                            compteur.incrementer();
-                            System.out.println("Inc ok...");
+                        case "T+":
+                            compteurText.incrementer();
+                            System.out.println("Inc Text ok...");
                             break;
-                        case "dec":
-                            compteur.decrementation();
-                            System.out.println("Dec ok...");
+                        case "T-":
+                            compteurText.decrementation();
+                            System.out.println("Dec Text ok...");
                             break;
-
+                        case "I+":
+                            compteurImage.incrementer();
+                            System.out.println("Inc Image ok...");
+                            break;
+                        case "I-":
+                            compteurImage.decrementation();
+                            System.out.println("Dec Image ok...");
+                            break;
+                        case "T":
+                            out.println(compteurText.getPH());  
+                            break;
+                        case "I":
+                            out.println(compteurImage.getPH());
+                            break;
                         default:
                             System.out.println("Erreur");
                             break;
