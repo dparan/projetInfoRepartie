@@ -1,0 +1,15 @@
+[submodule "lanceur"]
+	path = lanceur
+	url = https://github.com/dparan/projetInfoRepartie.git
+[submodule "aiguilleur"]
+	path = aiguilleur
+	url = https://github.com/dparan/projetInfoRepartie.git
+[submodule "receveur"]
+	path = receveur
+	url = https://github.com/dparan/projetInfoRepartie.git
+[submodule "mobile"]
+	path = mobile
+	url = https://github.com/dparan/projetInfoRepartie.git
+[submodule "compteur"]
+	path = compteur
+	url = https://github.com/dparan/projetInfoRepartie.git
