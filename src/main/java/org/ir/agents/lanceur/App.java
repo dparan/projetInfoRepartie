@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
-import java.util.concurrent.Executor;
 
 /**
  * Agent lanceur
@@ -47,7 +46,7 @@ public class App {
                     socketClient.close();
                 }
 
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -95,12 +94,12 @@ public class App {
             }
             if (reqThread != null) {
                 reqThread.start();
-                // try {
-                // reqThread.join();
-                // } catch (InterruptedException e) {
-                // // TODO Auto-generated catch block
-                // e.printStackTrace();
-                // }
+                try {
+                    reqThread.join();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
     }
