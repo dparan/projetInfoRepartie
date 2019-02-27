@@ -24,38 +24,6 @@ import java.util.Scanner;
 public class App {
     private static ReqRunnable imageRunnable = new ReqRunnable();
     private static ReqRunnable texteRunnable = new ReqRunnable();
-    private static Runnable serveur = new Runnable() {
-
-        @Override
-        public void run() {
-            
-            try(ServerSocket socket = new ServerSocket(1102);){
-                // Boucle infinie pour la récéption du message saisi par l'utilisateur
-                while (true) {
-                    Socket socketClient = socket.accept();
-                    PrintWriter out = new PrintWriter(socketClient.getOutputStream(), true);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-                    // traitement de la saisie
-                    switch (in.readLine()) {
-                    case "text":
-                        // l'utilisateur souhaite récupérer du texte
-                        out.println("Du Texte");
-                        break;
-                    case "image":
-                        // l'utilisateur souhaite récupérer une image
-                        out.println("Une Image");
-                        break;
-                    default:
-                        // Saisie incorrecte
-                        out.println("error");
-                    }
-                    socketClient.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
     /**
      *  Affichage du menu 
@@ -65,9 +33,6 @@ public class App {
     }
 
     public static void main(String[] args) {
-
-        Thread serveurThread = new Thread(serveur);
-        serveurThread.start();
         // configuration du type de message qui sera envoyé aux aiguilleurs
         imageRunnable.configure("0-0-image");
         texteRunnable.configure("0-0-text");
@@ -112,6 +77,7 @@ public class App {
                     reqThread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    sc.close();
                 }
             }
         }
