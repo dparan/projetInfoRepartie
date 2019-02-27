@@ -16,21 +16,25 @@ public class ReqRunnable implements Runnable {
     private BufferedReader in;
 
     public void configure(String path) {
+        // valeur qui sera envoyé aux aiguilleurs 
+        // "text" ou "image"
         this.path = path;
     }
 
     @Override
     public void run() {
-        // prise en charge de la demande d'image
+        // Prise en charge de la demande d'image
         try {
             socket = new Socket("localhost", 1102);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // Ecriture du message dans le flux de sortie
             out.println(path);
+            // Trace pour le debug
             String res = in.readLine();
             System.out.println(res);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            
             e.printStackTrace();
         }
     }
