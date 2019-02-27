@@ -16,9 +16,17 @@ public class ReqRunnable implements Runnable {
     private BufferedReader in;
 
     public void configure(String path) {
-        // valeur qui sera envoyé aux aiguilleurs 
+        // valeur qui sera envoyé aux aiguilleurs
         // "text" ou "image"
         this.path = path;
+    }
+
+    public void parseAndDisplayMessage(String message) {
+        String data[] = message.split("-");
+        int direction = Integer.parseInt(data[0]);
+        int id = Integer.parseInt(data[1]);
+        String messageContent = data[2];
+        System.out.println(direction + "\n" + id + "\n" + messageContent);
     }
 
     @Override
@@ -32,9 +40,9 @@ public class ReqRunnable implements Runnable {
             out.println(path);
             // Trace pour le debug
             String res = in.readLine();
-            System.out.println(res);
+            parseAndDisplayMessage(res);
         } catch (IOException e) {
-            
+
             e.printStackTrace();
         }
     }

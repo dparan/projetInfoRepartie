@@ -69,8 +69,8 @@ public class App {
         Thread serveurThread = new Thread(serveur);
         serveurThread.start();
         // configuration du type de message qui sera envoyé aux aiguilleurs
-        imageRunnable.configure("image");
-        texteRunnable.configure("text");
+        imageRunnable.configure("0-0-image");
+        texteRunnable.configure("0-0-text");
     
         Scanner sc = new Scanner(System.in);
         while (true) {
