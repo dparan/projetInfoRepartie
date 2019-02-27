@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * <p>
@@ -27,13 +28,15 @@ public class ReqRunnable implements Runnable {
     private Socket socket;
     /**
      * <p>
-     * Chaine de caractères sous la forme <direction>-<id>-<message>, ex: 0-1-text. Ce path est modifiable
+     * Message à transmettre.
+     * Ce path est modifiable
      * </p>
      *
      * @see ReqRunnable#configure
+     * @see Message
      *
      */
-    private String path;
+    private Message path;
     /**
      *
      * <p>
@@ -60,7 +63,7 @@ public class ReqRunnable implements Runnable {
      * @param path Le nouveau path à envoyer
      **/
 
-    public void configure(String path) {
+    public void configure(Message path) {
         // valeur qui sera envoyé aux aiguilleurs
         this.path = path;
     }
@@ -72,10 +75,13 @@ public class ReqRunnable implements Runnable {
      */
     public void parseAndDisplayMessage(String message) {
         String data[] = message.split("-");
-        int direction = Integer.parseInt(data[0]);
-        int id = Integer.parseInt(data[1]);
-        String messageContent = data[2];
-        System.out.println(direction + "\n" + id + "\n" + messageContent);
+        Message parsedMessage;
+        try {
+            parsedMessage = new Message(data[1], data[0], Integer.parseInt(data[2]));
+            System.out.println(parsedMessage);
+        } catch (NumberFormatException | UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -1,14 +1,14 @@
 package org.ir.agents.lanceur;
 
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
  * Agent lanceur
  * 
  *
- *          Permet de choisir le type de requête à propager Les choix sont : 1 -
- *          Images 2 - Texte Les réponses attendues sont : 1 - Une Image 2 - Du
- *          Texte
+ * Permet de choisir le type de requête à propager Les choix sont : 1 - Images 2
+ * - Texte Les réponses attendues sont : 1 - Une Image 2 - Du Texte
  *
  * @version 1.0
  */
@@ -16,7 +16,8 @@ public class App {
     /**
      *
      * <p>
-     * Variable statique représentant une instance de la classe ReqRunnable pour les images
+     * Variable statique représentant une instance de la classe ReqRunnable pour les
+     * images
      * </p>
      * 
      * @see ReqRunnable
@@ -26,7 +27,8 @@ public class App {
     /**
      *
      * <p>
-     * Variable statique représentant une instance de la classe ReqRunnable pour le texte
+     * Variable statique représentant une instance de la classe ReqRunnable pour le
+     * texte
      * </p>
      * 
      * @see ReqRunnable
@@ -47,6 +49,14 @@ public class App {
     }
 
     public static void main(String[] args) {
+        Message imageMessage = null;
+        Message textMessage = null;
+        try {
+            imageMessage = new Message("image");
+            textMessage = new Message("text");
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();         
+        }
         /**
          *
          * @see ReqRunnable#path
@@ -54,14 +64,14 @@ public class App {
          *
          */
 
-        imageRunnable.configure("0-0-image");
+        imageRunnable.configure(imageMessage);
         /**
          *
          * @see ReqRunnable#path
          * @see ReqRunnable#configure
          *
          */
-        texteRunnable.configure("0-0-text");
+        texteRunnable.configure(textMessage);
         /**
          *
          * <p>
