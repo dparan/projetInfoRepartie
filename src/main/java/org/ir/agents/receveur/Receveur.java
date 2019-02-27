@@ -1,9 +1,6 @@
 package org.ir.agents.receveur;
 
-import java.awt.List;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,18 +14,31 @@ public class Receveur {
     static ArrayList<Path> tableau = new ArrayList<>();
     static int i;
 
-    public void displayText(String chemin) throws IOException {
-        Files.newDirectoryStream(Paths.get(chemin), path -> path.toString().contains(".")).forEach(tableau::add);// mettre en tab & reccuperer un au hasard  
+    /**
+     * Remplis un tableau avec les chemins des fichiers
+     * 
+     * @param chemin le chemin du dossier à parcourir
+     */
+    public void remplirTableau(String chemin) throws IOException {
+        // remplissage du tableau avec les fichiers
+        Files.newDirectoryStream(Paths.get(chemin), path -> path.toString().contains(".")).forEach(tableau::add);
         for (Path s : Files.newDirectoryStream(Paths.get(chemin), path -> !path.toString().contains("."))) {
-            displayText(s.toString());
+            // parcourt récursif des dossiers
+            remplirTableau(s.toString());
         }
     }
 
-    public String typeText(String text) throws IOException {
-        if (text.endsWith(".txt")) {
+    /**
+     * Retourne le contenu d'un fichier texte aléatoire
+     * 
+     * @param chemin le chemin du fichier à retourner
+     */
+    public String getTextFile(String chemin) throws IOException {
+        if (chemin.endsWith(".txt")) {
             // Contenu du texte
             StringBuilder stringBuilder = new StringBuilder();
-            Stream<String> stream = Files.lines(Paths.get(text));
+            Stream<String> stream = Files.lines(Paths.get(chemin));
+            // ajout de toutes les lignes du fichier dans le stringBuilder
             stream.forEach(stringBuilder::append);
             stream.close();
             return stringBuilder.toString();
@@ -37,18 +47,26 @@ public class Receveur {
         }
 
     }
-
-    public String typeImage(String text) throws IOException {
-        byte[] fileContent = Files.readAllBytes(Paths.get(text));
-        String encodedString = Base64.getEncoder().encodeToString(fileContent);
-        return encodedString;
-
+    /**
+     * Retourne le contenu d'un fichier de type image
+     * 
+     * @param chemin le chemin du fichier à retourner
+     */
+    public String getImageFile(String chemin) throws IOException {
+        // récuperation de tous les bits du fichier 
+        byte[] fileContent = Files.readAllBytes(Paths.get(chemin));
+        // encode en base 64 l'image et retourne la chaîne
+        return Base64.getEncoder().encodeToString(fileContent);
     }
 
+    /**
+     * Récupération d'un élément aléatoire dans le tableau
+     * 
+     */
     String getRandomElement() {
-               Random aleatoire = new Random(); 
-	    	 int size = tableau.size();
-	    	 int i = aleatoire.nextInt(size);
-	    return tableau.get(i).toString();  
+        Random aleatoire = new Random();
+        int size = tableau.size();
+        int i = aleatoire.nextInt(size);
+        return tableau.get(i).toString();
     }
 }

@@ -9,32 +9,37 @@ import java.net.Socket;
 
 public class AgentReceveur {
 
-    private static Receveur TestText = new Receveur();
-    private static Receveur TestImage = new Receveur();
-
     private static final String PATH = "D:/ProjetM1";
     private static Runnable serveur = new Runnable() {
 
+        /**
+         * Méthode à exécuter par le thread
+         * 
+         * @param socket le socket de communication
+         */
         private void handling(ServerSocket socket) throws IOException {
             while (true) {
                 Receveur r = new Receveur();
                 Socket socketClient = socket.accept();
                 PrintWriter out = new PrintWriter(socketClient.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+                //  récupération du message 
                 String str = in.readLine();
                 String str_arr[] = str.split("-");
                 switch (str_arr[2]) {
-                    case "text":
-                        r.displayText(PATH);
-                        out.println(r.typeText(r.getRandomElement()));
-                        break;
-                    case "image":
-                        r.displayText(PATH);
-                        out.println(r.typeImage(r.getRandomElement()));
-                        break;
-                    default:
-                        System.err.println("erreur");
-
+                case "text":
+                    // récupération et envoit du contenu d'un fichier texte
+                    r.remplirTableau(PATH);
+                    out.println(new Message(str_arr[1], r.getTextFile(r.getRandomElement()), 1));
+                    break;
+                case "image":
+                    // récupération et envoit du contenu d'un fichier imagex
+                    r.remplirTableau(PATH);
+                    out.println(new Message(str_arr[1], r.getImageFile(r.getRandomElement()), 1));
+                    break;
+                default:
+                    System.err.println("erreur");
+                    out.println("erreur");
                 }
             }
 
@@ -61,7 +66,6 @@ public class AgentReceveur {
     };
 
     public static void main(String[] args) throws InterruptedException {
-
         Thread serveurThread = new Thread(serveur);
         serveurThread.start();
         serveurThread.join();
