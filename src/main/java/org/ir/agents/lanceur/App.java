@@ -5,12 +5,12 @@ import java.util.Scanner;
 /**
  * Agent lanceur
  * 
- * @version 1.0
  *
  *          Permet de choisir le type de requête à propager Les choix sont : 1 -
  *          Images 2 - Texte Les réponses attendues sont : 1 - Une Image 2 - Du
  *          Texte
  *
+ * @version 1.0
  */
 public class App {
     /**
