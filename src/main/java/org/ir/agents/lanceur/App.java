@@ -1,11 +1,5 @@
 package org.ir.agents.lanceur;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Scanner;
 
 /**
@@ -22,28 +16,61 @@ import java.util.Scanner;
  *
  */
 public class App {
+    /**
+    *
+    *       <p> Variable statique présente une instance de la classe ReqRunnable </p>
+    *         @see  ReqRunnable
+    *
+    */
     private static ReqRunnable imageRunnable = new ReqRunnable();
+     /**
+    *
+    *       <p> Variable statique présente une instance de la classe ReqRunnable </p>
+    *       @see ReqRunnable
+    *
+    */
     private static ReqRunnable texteRunnable = new ReqRunnable();
 
-    /**
-     *  Affichage du menu 
-     */
+     /**
+    *
+    *    <p> Methode parmet l'affichage </P> 
+    *
+    *
+    */
     private static void display() {
         System.out.println("1-\tImage\n2-\tTexte\n3-\tQuitter\n");
     }
 
     public static void main(String[] args) {
-        // configuration du type de message qui sera envoyé aux aiguilleurs
+    /**
+    *
+    *       @see ReqRunnable#path
+    *       @see ReqRunnable#configure
+    *
+    */
+
         imageRunnable.configure("0-0-image");
+    /**
+    *
+    *       @see ReqRunnable#path
+    *       @see ReqRunnable#configure
+    *
+    */
         texteRunnable.configure("0-0-text");
-    
+        /**
+        *
+        *       <p> Traitement de la saisie </p>
+        *
+        *
+        */
         Scanner sc = new Scanner(System.in);
         while (true) {
             // affichage du menu et saisie de la valeur
             display();
             while (!sc.hasNextInt()) {
-                // prise en charge des erreurs de saisie
-                // l'entrée n'est pas un entier
+                /** <p>Prise en charge des erreurs de saisie. </p>
+                * <p> l'entrée n'est pas un entier. </p>
+                */
                 System.out.println("Veuillez saisir 1, 2 ou 3");
                 display();
                 sc.nextLine();
