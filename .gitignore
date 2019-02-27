@@ -11,10 +11,11 @@ buildNumber.properties
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
 .project
-.settings/org.eclipse.core.resources.prefs
 .classpath
-.settings/org.eclipse.m2e.core.prefs
-.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.core.resources.prefs
 .settings/org.eclipse.jdt.apt.core.prefs
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.m2e.core.prefs
 
-.vscode/
+.vscode
+.DS_Store
