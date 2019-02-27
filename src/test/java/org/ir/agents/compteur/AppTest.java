@@ -58,8 +58,6 @@ public class AppTest {
             in.close();
             out.close();
         }
-        t.interrupt();
-        t.join();
         App.kill();
     }
 

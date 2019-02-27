@@ -79,7 +79,6 @@ public class App {
                 default:
                     System.err.println("Erreur entrée invalide");
                     out.println(-1);
-                    socketClient.close();
                 }
             }
         }
@@ -102,15 +101,19 @@ public class App {
             }
         }
     };
+    /**
+     * Thread sur lequel tourne le serveur.
+     */
+    private static Thread serveurThread;
 
     public static void start() throws InterruptedException {
-        Thread serveurThread = new Thread(serveur);
+        serveurThread = new Thread(serveur);
         serveurThread.start();
         serveurThread.join();
     }
 
     public static void kill() {
-        System.exit(0);
+        serveurThread.interrupt();
     }
 
     public static void main(String[] args) {
