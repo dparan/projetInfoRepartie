@@ -21,7 +21,9 @@
         <module>aiguilleur</module>
         <module>compteur</module>
         <module>lanceur</module>
-        <module>mobile</module>
+        <!-- désactivation du module mobile
+        En cours de développement -->
+        <!-- <module>mobile</module> -->
         <module>receveur</module>
     </modules>
 
