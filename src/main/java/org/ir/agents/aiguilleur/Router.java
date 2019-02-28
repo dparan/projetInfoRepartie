@@ -57,14 +57,15 @@ public class Router implements Runnable {
 
             LOGGER.log(Level.INFO, "Received message from {0}.", senderHostname);
             LOGGER.log(Level.INFO, "Message : {0}", message);
-            // On mémorise qui a envoyé le message
-            routes.put(messages[1], senderHostname);
-
-            LOGGER.log(Level.INFO, "Added route : ID={0} , Hostname={1}", new Object[]{messages[1], senderHostname});
 
             // 0 = message descendant
-            if (messages[0].equals("0"))
+            if (messages[0].equals("0")) {
+                // On mémorise qui a envoyé le message
+                routes.put(messages[1], senderHostname);
+                LOGGER.log(Level.INFO, "Added route : ID={0} , Hostname={1}", new Object[]{messages[1], senderHostname});
+
                 handleDescendingMessage(message);
+            }
 
             // 1 = message montant
             else if (messages[0].equals("1"))
