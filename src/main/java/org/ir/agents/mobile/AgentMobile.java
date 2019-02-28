@@ -1,97 +1,97 @@
 package org.ir.agents.mobile;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamClass;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Objects;
 
-
-
-
-public class AgentMobile extends ObjectInputStream{
-
-
-
-	private ClassLoader remoteObjectClassLoader = null;
+/**
+ * AgentMobile
+ */
+public class AgentMobile extends ObjectInputStream {
     private final String id;
-    private String content;
-    private Integer direction = 0;
-    private static final int MIN = 0;
+    private final String type;
+    private boolean direction = false;
+    private String value = null;
+    private ClassLoader remoteObjectClassLoader = null;
     private static final int MAX = Integer.MAX_VALUE;
 
-    public AgentMobile(String id, String content, Integer direction,InputStream is, URL classpath) throws UnknownHostException {
-        if (id != null) {
-            this.id = id;
-        } else {
-        	
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            int nombreAleatoire = MIN + (int) (Math.random() * ((MAX - MIN) + 1));
-            Date now = new Date();
-            long nowTimeStamp = now.toInstant().toEpochMilli();
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(inetAddress.getHostName()).append(nombreAleatoire).append(nowTimeStamp);
-            this.id = stringBuilder.toString();
-        }
-        this.content = content;
-        if (direction != null) {
-            this.direction = direction;
-        }
+    public AgentMobile(String type, InputStream is, URL classpath) throws UnknownHostException, IOException {
         super(is);
-			URL[] urls = {classpath};
-			remoteObjectClassLoader = new URLClassLoader(urls);
-    }
-    protected Class resolveClass(ObjectStreamClass desc)
-		throws IOException, ClassNotFoundException {
-		return remoteObjectClassLoader.loadClass(desc.getName());
-		}
-    public AgentMobile(String content) throws UnknownHostException {
-        this(null, content, null);
+        URL[] urls = {classpath};
+        remoteObjectClassLoader = new URLClassLoader(urls);
+
+        InetAddress inetAddress = InetAddress.getLocalHost();
+        int nombreAleatoire = (int) (Math.random() * MAX);
+        Date now = new Date();
+        long nowTimeStamp = now.toInstant().toEpochMilli();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(inetAddress.getHostName()).append(nombreAleatoire).append(nowTimeStamp);
+
+        this.id = stringBuilder.toString();
+        this.type = type;
     }
 
-    public AgentMobile(String content, int direction) throws UnknownHostException {
-        this(null, content, direction);
+    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+        return remoteObjectClassLoader.loadClass(desc.getName());
     }
 
-    /**
-     * @return the id
-     */
     public String getId() {
-        return id;
+        return this.id;
     }
 
-    /**
-     * @return the content
-     */
-    public String getContent() {
-        return content;
+
+    public String getType() {
+        return this.type;
     }
 
-    /**
-     * @return the direction
-     */
-    public int getDirection() {
-        return direction;
+    public boolean getDirection() {
+        return this.direction;
     }
 
-    /**
-     * @param content the content to set
-     */
-    public void setContent(String content) {
-        this.content = content;
+    public String getValue() {
+        return this.value;
     }
 
-    /**
-     * @param direction the direction to set
-     */
-    public void setDirection(int direction) {
-        this.direction = direction;
+    public void changeDirection() {
+        direction = !direction;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof AgentMobile)) {
+            return false;
+        }
+        AgentMobile agentMobile = (AgentMobile) o;
+        return Objects.equals(id, agentMobile.id) && Objects.equals(type, agentMobile.type) && direction == agentMobile.direction && Objects.equals(value, agentMobile.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, direction, value);
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(direction).append("-").append(id).append("-").append(content);
-        return stringBuilder.toString();
+        return "{" +
+            " id='" + getId() + "'" +
+            ", type='" + getType() + "'" +
+            ", direction='" + getDirection() + "'" +
+            ", value='" + getValue() + "'" +
+            "}";
     }
 
-}
 
 }
