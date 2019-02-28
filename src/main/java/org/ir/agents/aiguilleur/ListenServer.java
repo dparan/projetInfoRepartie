@@ -33,9 +33,13 @@ public class ListenServer implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Thread serverThread = new Thread(new ListenServer());
-        serverThread.start();
-        serverThread.join();
+    public static void main(String[] args) {
+        try {
+            Thread serverThread = new Thread(new ListenServer());
+            serverThread.start();
+            serverThread.join();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
