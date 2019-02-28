@@ -39,7 +39,7 @@ public class AgentReceveur {
                     break;
                 default:
                     System.err.println("erreur");
-                    out.println("erreur");
+                    out.println(new Message(str_arr[1], "erreur", 1));
                 }
             }
 
