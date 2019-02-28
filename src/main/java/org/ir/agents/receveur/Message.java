@@ -23,8 +23,11 @@ public class Message {
             Date now = new Date();
             long nowTimeStamp = now.toInstant().toEpochMilli();
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(inetAddress.getHostName()).append(nombreAleatoire).append(nowTimeStamp);
+            stringBuilder.append(inetAddress.getHostName()).append(Math.abs(nombreAleatoire)).append(nowTimeStamp);
             this.id = stringBuilder.toString();
+            System.out.println(inetAddress.getHostName());
+            System.out.println(nombreAleatoire);
+            System.out.println(this.id);
         }
         this.content = content;
         if (direction != null) {
