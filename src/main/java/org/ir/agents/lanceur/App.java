@@ -1,69 +1,43 @@
 package org.ir.agents.lanceur;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Scanner;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Agent lanceur
- * 
- *
- * Permet de choisir le type de requête à propager Les choix sont : 1 - Images 2
- * - Texte Les réponses attendues sont : 1 - Une Image 2 - Du Texte
+ * Permet de choisir le type de requête à propager.
  *
  * @version 1.0
  */
-public class App {
-    /**
-     *
-     * <p>
-     * Variable statique représentant une instance de la classe ReqRunnable pour les
-     * images
-     * </p>
-     * 
-     * @see ReqRunnable
-     *
-     */
-    private static ReqRunnable imageRunnable = new ReqRunnable();
-    /**
-     *
-     * <p>
-     * Variable statique représentant une instance de la classe ReqRunnable pour le
-     * texte
-     * </p>
-     * 
-     * @see ReqRunnable
-     *
-     */
-    private static ReqRunnable texteRunnable = new ReqRunnable();
+public class App implements ActionListener {
 
-    /**
-     *
-     * <p>
-     * Methode permetant l'affichage
-     * </P>
-     *
-     *
-     */
-    private static void display() {
-        System.out.println("1-\tImage\n2-\tTexte\n3-\tQuitter\n");
+    private static final Logger LOGGER = Logger.getLogger("AgentLanceur");
+
+    private JFrame frame;
+    private JRadioButton imageCheckBox;
+    private JRadioButton textCheckBox;
+
+    private ReqRunnable imageRunnable;
+    private ReqRunnable texteRunnable;
+
+    private App() {
+        imageRunnable = new ReqRunnable();
+        texteRunnable = new ReqRunnable();
     }
 
-    /**
-     * Méthode permettant d'afficher un message reçu des aiguilleurs
-     * 
-     * @param message reçu depuis un socket d'aiguilleur
-     */
-    public static void parseAndDisplayMessage(String message) {
-        String data[] = message.split("-");
+    private void parseAndDisplayMessage(String message) {
+        String[] data = message.split("-");
         Message parsedMessage;
         try {
             parsedMessage = new Message(data[1], data[2], Integer.parseInt(data[0]));
@@ -74,17 +48,61 @@ public class App {
             File filesave = new File(parsedMessage.getId() + (data[2].equals("text") ? ".txt" : ".jpg"));
             FileOutputStream fileOutputStream = new FileOutputStream(filesave);
             fileOutputStream.write(Base64.getDecoder().decode(parsedMessage.getValue()));
-            System.out.println("Fichier sauvegardé à " + filesave.getAbsolutePath());
+            LOGGER.info("Fichier sauvegardé à " + filesave.getAbsolutePath());
             fileOutputStream.close();
+
+            display(filesave);
         } catch (NumberFormatException | IOException e) {
-            e.printStackTrace();
+            LOGGER.severe(e.getMessage());
         }
     }
 
-    private static Runnable serveurRunnable = new Runnable(){
-    
-        @Override
-        public void run() {
+    private void display(File file) {
+        try {
+            // Si on a une image
+            if (file.getAbsolutePath().endsWith(".jpg")) {
+
+                JDialog dialog = new JDialog(frame, "Image");
+                JLabel image = new JLabel(new ImageIcon(file.toURI().toURL()));
+                dialog.add(image);
+                dialog.pack();
+                dialog.setVisible(true);
+
+            // Si on a un texte
+            } else if (file.getAbsolutePath().endsWith(".txt")) {
+
+                JDialog dialog = new JDialog(frame, "Texte");
+                JLabel texte = new JLabel(readTextFromFile(file));
+                dialog.add(texte);
+                dialog.pack();
+                dialog.setVisible(true);
+
+            } else
+                JOptionPane.showMessageDialog(frame,
+                        "Impossible de reconnaître l'extension du fichier reçu.",
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+
+        } catch (MalformedURLException e) {
+            LOGGER.severe(e.getMessage());
+        }
+    }
+
+    private String readTextFromFile(File file) {
+        try {
+            String filename = file.getAbsolutePath();
+            Path path = Paths.get(filename);
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            return String.join("", lines);
+        } catch (IOException e) {
+            LOGGER.severe(e.getMessage());
+        }
+
+        return null;
+    }
+
+    private void startServer() {
+        new Thread(() -> {
             ServerSocket serveur = null;
             try {
                 serveur = new ServerSocket(1101);
@@ -98,100 +116,97 @@ public class App {
                     try {
                         serveur.close();
                     } catch (IOException e1) {
-                        e1.printStackTrace();
+                        LOGGER.severe(e.getMessage());
                     }
                 }
-                e.printStackTrace();
+                LOGGER.severe(e.getMessage());
             }
-        }
-    };
+        }).start();
+    }
 
-    private static Thread serveurThread = null;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            Thread reqThread;
 
-    public static void main(String[] args) {
-        serveurThread = new Thread(serveurRunnable);
-        serveurThread.start();
-        Message imageMessage = null;
-        Message textMessage = null;
-        /**
-         *
-         * <p>
-         * Traitement de la saisie
-         * </p>
-         *
-         *
-         */
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            // affichage du menu et saisie de la valeur
-            display();
-            while (!sc.hasNextInt()) {
-                /**
-                 * <p>
-                 * Prise en charge des erreurs de saisie.
-                 * </p>
-                 * <p>
-                 * l'entrée n'est pas un entier.
-                 * </p>
-                 */
-                System.out.println("Veuillez saisir 1, 2 ou 3");
-                display();
-                sc.nextLine();
-            }
-            int num = sc.nextInt();
-            Thread reqThread = null;
-            try {
-                imageMessage = new Message("image");
-                textMessage = new Message("text");
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();         
-            }
-            /**
-             *
-             * @see ReqRunnable#path
-             * @see ReqRunnable#configure
-             *
-             */
+            Message imageMessage = new Message("image");
+            Message textMessage = new Message("text");
 
             imageRunnable.configure(imageMessage);
-            /**
-             *
-             * @see ReqRunnable#path
-             * @see ReqRunnable#configure
-             *
-             */
             texteRunnable.configure(textMessage);
 
-            switch (num) {
-            case 1:
-                // On souhaite avoir une image
+            if (imageCheckBox.isSelected())
                 reqThread = new Thread(imageRunnable);
-                break;
-            case 2:
-                // On souhaite avoir du texte
+
+            else if (textCheckBox.isSelected())
                 reqThread = new Thread(texteRunnable);
-                break;
-            case 3:
-                // fin du programme
-                serveurThread.interrupt();
-                System.exit(0);
-                break;
-            default:
-                // Erreur de saisie
-                System.out.println("Veuillez saisir 1, 2 ou 3");
-                sc.nextLine();
-                break;
+
+            else {
+                JOptionPane.showMessageDialog(frame, "Veuillez sélectionner image ou texte.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            // lancement du thread
-            if (reqThread != null) {
-                reqThread.start();
-                try {
-                    reqThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    sc.close();
-                }
-            }
+
+            reqThread.start();
+            reqThread.join();
+
+        } catch (InterruptedException | UnknownHostException e1) {
+            LOGGER.severe(e1.getMessage());
         }
+    }
+
+    private void displayGUI() throws UnknownHostException {
+        frame = new JFrame("Agent Lanceur");
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // CENTER
+        JPanel centerPanel = new JPanel(new BorderLayout());
+
+        { // Center of CENTER
+            JPanel gridPanel = new JPanel(new GridLayout(1, 2));
+
+            ButtonGroup radioGroup = new ButtonGroup();
+
+            imageCheckBox = new JRadioButton("Image");
+            radioGroup.add(imageCheckBox);
+
+            textCheckBox = new JRadioButton("Texte");
+            textCheckBox.setSelected(true);
+            radioGroup.add(textCheckBox);
+
+            gridPanel.add(imageCheckBox);
+            gridPanel.add(textCheckBox);
+
+            centerPanel.add(gridPanel, BorderLayout.CENTER);
+        }
+
+        { // South of CENTER
+            JPanel buttonPanel = new JPanel();
+            JButton sendButton = new JButton("Lancer !");
+
+            sendButton.addActionListener(this);
+
+            buttonPanel.add(sendButton);
+            centerPanel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+
+        // SOUTH
+        JPanel southPanel = new JPanel();
+        JLabel hostnameLabel = new JLabel("Hostname : " + InetAddress.getLocalHost().getHostName());
+        southPanel.add(hostnameLabel);
+
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(southPanel, BorderLayout.SOUTH);
+
+        frame.setContentPane(mainPanel);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) throws UnknownHostException {
+        App app = new App();
+        app.startServer();
+        app.displayGUI();
     }
 }
