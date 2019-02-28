@@ -6,10 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AgentReceveur {
 
     private static final String PATH = "/media/Donnees/ProjetM1";
+    private static final Logger LOGGER = Logger.getGlobal();
     private static Runnable serveur = new Runnable() {
 
         /**
@@ -18,7 +21,7 @@ public class AgentReceveur {
          * @param socket le socket de communication
          */
         private void handling(ServerSocket socket) throws IOException {
-            System.out.println("création du receveur");
+            LOGGER.log(Level.INFO, "Creating receiver");
             Receveur r = new Receveur();
             while (true) {
                 Socket socketClient = socket.accept();
@@ -27,21 +30,21 @@ public class AgentReceveur {
                 //  récupération du message 
                 String str = in.readLine();
                 String str_arr[] = str.split("-");
-                System.out.println("message reçu, id :" + str_arr[1] + " direction :" + str_arr[0] + " contenu :" + str_arr[2]);
+                LOGGER.log(Level.INFO, "Message received: {0}", new Message(str_arr[1], str_arr[2], Integer.parseInt(str_arr[0])));
                 switch (str_arr[2]) {
                 case "text":
                     // récupération et envoit du contenu d'un fichier texte
-                    System.out.println("Remplissage du tableau");
                     r.remplirTableau(PATH);
-                    System.out.println("Réussi");
-                    out.println(new Message(str_arr[1], r.getTextFile(r.getRandomElement()), 1));
+                    Message textMessage = new Message(str_arr[1], str_arr[2], 1);
+                    textMessage.setValue(r.getTextFile(r.getRandomElement()));
+                    out.println();
                     break;
                 case "image":
                     // récupération et envoit du contenu d'un fichier imagex
-                    System.out.println("Remplissage du tableau");
                     r.remplirTableau(PATH);
-                    System.out.println("Réussi");
-                    out.println(new Message(str_arr[1], r.getImageFile(r.getRandomElement()), 1));
+                    Message imageMessage = new Message(str_arr[1], str_arr[2], 1);
+                    imageMessage.setValue(r.getImageFile(r.getRandomElement()));
+                    out.println(imageMessage);
                     break;
                 default:
                     System.err.println("erreur");

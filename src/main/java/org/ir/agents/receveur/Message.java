@@ -11,6 +11,7 @@ public class Message {
     private final String id;
     private String content;
     private Integer direction = 0;
+    private String value = null;
     private static final int MIN = 0;
     private static final int MAX = Integer.MAX_VALUE;
 
@@ -65,6 +66,13 @@ public class Message {
     }
 
     /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
      * @param content the content to set
      */
     public void setContent(String content) {
@@ -78,10 +86,17 @@ public class Message {
         this.direction = direction;
     }
 
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(direction).append("-").append(id).append("-").append(content);
+        stringBuilder.append(direction).append("-").append(id).append("-").append(content).append(value != null ? "-"+value : "");
         return stringBuilder.toString();
     }
 
