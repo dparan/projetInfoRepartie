@@ -166,15 +166,17 @@ public class Router implements Runnable {
 
         // On recupere l'hostname du destinataire
         String receiverHostname = routes.get(id);
-        LOGGER.log(Level.INFO, "Sending ascending message to {0}.", receiverHostname);
-
         Socket receiver;
 
         // Si la route pointe sur localhost -> on envoi la réponse au lanceur
-        if (InetAddress.getLocalHost().getHostName().equals(receiverHostname))
+        if ("localhost".equals(receiverHostname)) {
             receiver = new Socket(receiverHostname, LAUNCHER_PORT);
-        else // Sinon on remonte au prochain aiguilleur
+            LOGGER.log(Level.INFO, "Sending message to launcher : {0}.", receiverHostname);
+        }
+        else { // Sinon on remonte au prochain aiguilleur
             receiver = new Socket(receiverHostname, ListenServer.PORT);
+            LOGGER.log(Level.INFO, "Sending message to next router : {0}.", receiverHostname);
+        }
 
         PrintWriter writer = new PrintWriter(receiver.getOutputStream(), true);
         writer.println(message);
