@@ -105,7 +105,7 @@ public class Receveur {
      * Récupération d'un élément aléatoire dans le tableau
      * 
      */
-    String getRandomElement() {
+    public String getRandomElement() {
         Random aleatoire = new Random();
         int size = tableau.size();
         int i = aleatoire.nextInt(size);
