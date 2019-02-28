@@ -75,10 +75,12 @@ public class App implements ActionListener {
                 JTextArea textArea = new JTextArea(30, 30);
 
                 JScrollPane scrollPane = new JScrollPane(textArea);
-                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                 scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-                textArea.setText(readTextFromFile(file));
+                String text = readTextFromFile(file);
+                if (text != null || text.isEmpty()) text = "text is empty/null..";
+                textArea.setText(text);
 
                 dialog.add(scrollPane);
                 dialog.pack();
