@@ -60,6 +60,8 @@ public class Router implements Runnable {
             // On mémorise qui a envoyé le message
             routes.put(messages[1], senderHostname);
 
+            LOGGER.log(Level.INFO, "Added route : ID={0} , Hostname={1}", new Object[]{messages[1], senderHostname});
+
             // 0 = message descendant
             if (messages[0].equals("0"))
                 handleDescendingMessage(message);
@@ -147,6 +149,7 @@ public class Router implements Runnable {
         writer.println(message);
 
         String received = reader.readLine();
+        LOGGER.info("Received message from local receiver..");
         handleAscendingMessage(received, received.split("-")[1]);
     }
 
