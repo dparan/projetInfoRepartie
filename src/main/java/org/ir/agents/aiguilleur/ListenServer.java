@@ -32,4 +32,10 @@ public class ListenServer implements Runnable {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Thread serverThread = new Thread(new ListenServer());
+        serverThread.start();
+        serverThread.join();
+    }
 }

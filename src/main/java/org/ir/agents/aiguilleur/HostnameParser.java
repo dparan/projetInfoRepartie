@@ -2,7 +2,7 @@ package org.ir.agents.aiguilleur;
 
 public class HostnameParser {
 
-    private static final String NAME = "frodon";
+    public static final String NAME = "frodon";
 
     private HostnameParser() {}
 

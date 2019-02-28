@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.ir.agents.aiguilleur.HostnameParser.NAME;
+
 public class Router implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger("Router");
@@ -79,7 +81,7 @@ public class Router implements Runnable {
         LOGGER.info("Descending message.");
 
         // Si on est un poste receveur
-        if (hostname.equals("frodon01") || hostname.equals("frodon02")) {
+        if (hostname.equals(NAME + "01") || hostname.equals(NAME + "02")) {
             LOGGER.info("Sending to message to local receiver...");
             sendToLocalReceiver(message);
     
