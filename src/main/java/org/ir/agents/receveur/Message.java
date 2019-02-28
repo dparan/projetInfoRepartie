@@ -13,7 +13,7 @@ public class Message {
     private Integer direction = 0;
     private String value = null;
     private static final int MIN = 0;
-    private static final int MAX = Integer.MAX_VALUE;
+    private static final int MAX = Integer.MAX_VALUE - 1;
 
     public Message(String id, String content, Integer direction) throws UnknownHostException {
         if (id != null) {
@@ -26,9 +26,6 @@ public class Message {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(inetAddress.getHostName()).append(Math.abs(nombreAleatoire)).append(nowTimeStamp);
             this.id = stringBuilder.toString();
-            System.out.println(inetAddress.getHostName());
-            System.out.println(nombreAleatoire);
-            System.out.println(this.id);
         }
         this.content = content;
         if (direction != null) {
