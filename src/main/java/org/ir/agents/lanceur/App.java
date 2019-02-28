@@ -71,11 +71,19 @@ public class App implements ActionListener {
             // Si on a un texte
             } else if (file.getAbsolutePath().endsWith(".txt")) {
 
-                JDialog dialog = new JDialog(frame, "Texte");
-                JLabel texte = new JLabel(readTextFromFile(file));
-                dialog.add(texte);
+                JFrame dialog = new JFrame("texte");
+                JTextArea textArea = new JTextArea(30, 30);
+
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+                textArea.setText(readTextFromFile(file));
+
+                dialog.add(scrollPane);
                 dialog.pack();
                 dialog.setVisible(true);
+                dialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
             } else
                 JOptionPane.showMessageDialog(frame,
