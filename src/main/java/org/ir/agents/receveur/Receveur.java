@@ -77,7 +77,8 @@ public class Receveur {
                 if (!entry.isDirectory()) {
                     StringBuilder stringBuilder = getTxtFiles(zipFile.getInputStream(entry));
                     zipFile.close();
-                    return stringBuilder.toString();
+                    // encode en base 64 l'image et retourne la chaîne
+                    return Base64.getEncoder().encodeToString(stringBuilder.toString().getBytes());
                 }
             }
             zipFile.close();
