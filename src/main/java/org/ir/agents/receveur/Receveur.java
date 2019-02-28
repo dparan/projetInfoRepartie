@@ -29,7 +29,11 @@ public class Receveur {
         if (tableau.isEmpty()) {
             // remplissage du tableau avec les fichiers
 
-            Files.newDirectoryStream(Paths.get(chemin), path -> Files.isRegularFile(path)).forEach(tableau::add);
+            Files.newDirectoryStream(Paths.get(chemin), path -> Files.isRegularFile(path)).forEach((Path el) -> {
+                if (!el.endsWith(".DS_Store")) {
+                    tableau.add(el);
+                }
+            });
             Files.newDirectoryStream(Paths.get(chemin), path -> Files.isDirectory(path)).forEach((Path el) -> {
                 try {
                     remplirTableau(el.toString());
