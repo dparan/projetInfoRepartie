@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -48,14 +49,34 @@ public class ReqRunnable implements Runnable {
      *
      */
     private PrintWriter out;
-    /**
-     *
-     * <p>
-     * Lecture du texte d'un flux de saisie de caractères
-     * </p>
-     *
-     */
-    private BufferedReader in;
+
+    private Runnable serveurRunnable = new Runnable(){
+    
+        @Override
+        public void run() {
+            ServerSocket serveur = null;
+            try {
+                serveur = new ServerSocket(1101);
+                while (true) {
+                    Socket socket = serveur.accept();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    parseAndDisplayMessage(in.readLine());
+                }
+            } catch (IOException e) {
+                if (serveur != null) {
+                    try {
+                        serveur.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private Thread serveurThread = null;
+    
 
     /**
      * Met à jour le path envoyé
@@ -78,10 +99,12 @@ public class ReqRunnable implements Runnable {
         Message parsedMessage;
         try {
             parsedMessage = new Message(data[1], data[0], Integer.parseInt(data[2]));
+            parsedMessage.setValue(data[3]);
             System.out.println(parsedMessage);
         } catch (NumberFormatException | UnknownHostException e) {
             e.printStackTrace();
         }
+        serveurThread.interrupt();
     }
 
     @Override
@@ -113,22 +136,10 @@ public class ReqRunnable implements Runnable {
              * @see ReqRunnable#socket
              */
             out = new PrintWriter(socket.getOutputStream(), true);
-            /**
-             * <p>
-             * Création d'un flux d'entrée de caractère en mémoire.
-             * </p>
-             * 
-             * @parm InputStreamReader Permettre la conversion d'octes en caractères.
-             * @parm getInputStream Retourne un flux d'entrée pour cette socket.
-             * @see ReqRunnable#BufferdReader
-             * @see ReqRunnable#socket
-             */
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             // Ecriture du message dans le flux de sortie
             out.println(path);
-            // Trace pour le debug
-            String res = in.readLine();
-            parseAndDisplayMessage(res);
+            serveurThread = new Thread(serveurRunnable);
+            serveurThread.start();
         } catch (IOException e) {
 
             e.printStackTrace();
