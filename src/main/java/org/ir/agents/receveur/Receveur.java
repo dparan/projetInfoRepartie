@@ -71,7 +71,7 @@ public class Receveur {
      */
     public String getTextFile(String chemin) throws IOException {
         if (chemin.endsWith(".zip")) {
-            ZipFile zipFile = new ZipFile("/Utilisateurs/dparant/Documents/testProjet.zip");
+            ZipFile zipFile = new ZipFile(chemin);
             for (Enumeration<? extends ZipEntry> e = zipFile.entries(); e.hasMoreElements();) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
                 if (!entry.isDirectory()) {
