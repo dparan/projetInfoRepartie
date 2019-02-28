@@ -28,25 +28,11 @@ public class Receveur {
         // on ne remplit le tableau qu'une fois
         if (tableau.isEmpty()) {
             // remplissage du tableau avec les fichiers
-
-            Files.newDirectoryStream(Paths.get(chemin), path -> Files.isRegularFile(path)).forEach((Path el) -> {
+            Files.find(Paths.get(chemin), Integer.MAX_VALUE,(path,fileAttr) -> fileAttr.isRegularFile()).forEach((Path el) -> {
                 if (!el.endsWith(".DS_Store")) {
                     tableau.add(el);
                 }
             });
-            Files.newDirectoryStream(Paths.get(chemin), path -> Files.isDirectory(path)).forEach((Path el) -> {
-                try {
-                    remplirTableau(el.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            /*
-             * for (Path s : Files.newDirectoryStream(Paths.get(chemin), path ->
-             * path.isDirectory()) { // parcourt récursif des dossiers
-             * remplirTableau(s.toString()); }
-             */
         }
     }
 
@@ -106,9 +92,7 @@ public class Receveur {
      * 
      */
     public String getRandomElement() {
-        Random aleatoire = new Random();
-        int size = tableau.size();
-        int i = aleatoire.nextInt(size);
+        int i = (int) (Math.random() * tableau.size());
         return tableau.get(i).toString();
     }
 }
