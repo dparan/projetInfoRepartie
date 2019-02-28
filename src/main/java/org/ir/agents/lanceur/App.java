@@ -1,6 +1,15 @@
 package org.ir.agents.lanceur;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Base64;
 import java.util.Scanner;
 
 /**
@@ -48,30 +57,62 @@ public class App {
         System.out.println("1-\tImage\n2-\tTexte\n3-\tQuitter\n");
     }
 
+    /**
+     * Méthode permettant d'afficher un message reçu des aiguilleurs
+     * 
+     * @param message reçu depuis un socket d'aiguilleur
+     */
+    public static void parseAndDisplayMessage(String message) {
+        String data[] = message.split("-");
+        Message parsedMessage;
+        try {
+            parsedMessage = new Message(data[1], data[2], Integer.parseInt(data[0]));
+            parsedMessage.setValue(data[3]);
+            if (parsedMessage.getValue().equals("notFound")) {
+                throw new FileNotFoundException();
+            }
+            File filesave = new File(parsedMessage.getId() + (data[2].equals("text") ? ".txt" : ".jpg"));
+            FileOutputStream fileOutputStream = new FileOutputStream(filesave);
+            fileOutputStream.write(Base64.getDecoder().decode(parsedMessage.getValue()));
+            System.out.println("Fichier sauvegardé à " + filesave.getAbsolutePath());
+            fileOutputStream.close();
+        } catch (NumberFormatException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Runnable serveurRunnable = new Runnable(){
+    
+        @Override
+        public void run() {
+            ServerSocket serveur = null;
+            try {
+                serveur = new ServerSocket(1101);
+                while(true) {
+                    Socket socket = serveur.accept();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    parseAndDisplayMessage(in.readLine());
+                }
+            } catch (IOException e) {
+                if (serveur != null) {
+                    try {
+                        serveur.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private static Thread serveurThread = null;
+
     public static void main(String[] args) {
+        serveurThread = new Thread(serveurRunnable);
+        serveurThread.start();
         Message imageMessage = null;
         Message textMessage = null;
-        try {
-            imageMessage = new Message("image");
-            textMessage = new Message("text");
-        } catch (UnknownHostException e1) {
-            e1.printStackTrace();         
-        }
-        /**
-         *
-         * @see ReqRunnable#path
-         * @see ReqRunnable#configure
-         *
-         */
-
-        imageRunnable.configure(imageMessage);
-        /**
-         *
-         * @see ReqRunnable#path
-         * @see ReqRunnable#configure
-         *
-         */
-        texteRunnable.configure(textMessage);
         /**
          *
          * <p>
@@ -99,6 +140,27 @@ public class App {
             }
             int num = sc.nextInt();
             Thread reqThread = null;
+            try {
+                imageMessage = new Message("image");
+                textMessage = new Message("text");
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();         
+            }
+            /**
+             *
+             * @see ReqRunnable#path
+             * @see ReqRunnable#configure
+             *
+             */
+
+            imageRunnable.configure(imageMessage);
+            /**
+             *
+             * @see ReqRunnable#path
+             * @see ReqRunnable#configure
+             *
+             */
+            texteRunnable.configure(textMessage);
 
             switch (num) {
             case 1:
@@ -111,6 +173,7 @@ public class App {
                 break;
             case 3:
                 // fin du programme
+                serveurThread.interrupt();
                 System.exit(0);
                 break;
             default:

@@ -49,35 +49,6 @@ public class ReqRunnable implements Runnable {
      *
      */
     private PrintWriter out;
-
-    private Runnable serveurRunnable = new Runnable(){
-    
-        @Override
-        public void run() {
-            ServerSocket serveur = null;
-            try {
-                serveur = new ServerSocket(1101);
-                while (true) {
-                    Socket socket = serveur.accept();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    parseAndDisplayMessage(in.readLine());
-                }
-            } catch (IOException e) {
-                if (serveur != null) {
-                    try {
-                        serveur.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                e.printStackTrace();
-            }
-        }
-    };
-
-    private Thread serveurThread = null;
-    
-
     /**
      * Met à jour le path envoyé
      * 
@@ -87,24 +58,6 @@ public class ReqRunnable implements Runnable {
     public void configure(Message path) {
         // valeur qui sera envoyé aux aiguilleurs
         this.path = path;
-    }
-
-    /**
-     * Méthode permettant d'afficher un message reçu des aiguilleurs
-     * 
-     * @param message reçu depuis un socket d'aiguilleur
-     */
-    public void parseAndDisplayMessage(String message) {
-        String data[] = message.split("-");
-        Message parsedMessage;
-        try {
-            parsedMessage = new Message(data[1], data[0], Integer.parseInt(data[2]));
-            parsedMessage.setValue(data[3]);
-            System.out.println(parsedMessage);
-        } catch (NumberFormatException | UnknownHostException e) {
-            e.printStackTrace();
-        }
-        serveurThread.interrupt();
     }
 
     @Override
@@ -138,8 +91,6 @@ public class ReqRunnable implements Runnable {
             out = new PrintWriter(socket.getOutputStream(), true);
             // Ecriture du message dans le flux de sortie
             out.println(path);
-            serveurThread = new Thread(serveurRunnable);
-            serveurThread.start();
         } catch (IOException e) {
 
             e.printStackTrace();
