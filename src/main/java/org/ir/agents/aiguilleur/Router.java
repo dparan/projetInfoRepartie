@@ -165,16 +165,19 @@ public class Router implements Runnable {
         PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
         
         // On incremente le compteur du noeud (courant)
-        if (message.contains("image"))
+        if (message.contains("image")) {
             writer.println("I+");
-        else if (message.contains("text"))
+            LOGGER.log(Level.INFO, "Sending increment message to local counter agent.");
+        }
+        else if (message.contains("text")) {
             writer.println("T+");
+            LOGGER.log(Level.INFO, "Sending increment message to local counter agent.");
+        }
 
         // On recupere l'hostname du destinataire
         String receiverHostname = routes.get(id);
+        LOGGER.log(Level.INFO, "Sending ascending message to {0}.", receiverHostname);
 
-        LOGGER.log(Level.INFO, "Sending increment message to {0}.", receiverHostname);
-        
         // Si on ne trouve pas d'hostname dans les routes, cela veut dire qu'on est certainement le destinataire du message
         if ("localhost".equals(receiverHostname))
             // writer = new PrintWriter(new Socket(hostname, LAUNCHER_PORT).getOutputStream(), true);
