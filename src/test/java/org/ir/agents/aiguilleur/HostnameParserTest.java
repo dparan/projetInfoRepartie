@@ -7,17 +7,17 @@ public class HostnameParserTest {
 
     @Test
     public void testGetNextHostnames() {
-        String hostname = "frodon20";
+        String hostname = "gollum20";
 
         Pair<String> hostnames = HostnameParser.getNextHostnames(hostname);
 
-        Assert.assertEquals("frodon10", hostnames.first());
-        Assert.assertEquals("frodon11", hostnames.second());
+        Assert.assertEquals("gollum10", hostnames.first());
+        Assert.assertEquals("gollum11", hostnames.second());
 
-        hostname = "frodon10";
+        hostname = "gollum10";
         hostnames = HostnameParser.getNextHostnames(hostname);
 
-        Assert.assertEquals("frodon05", hostnames.first());
-        Assert.assertEquals("frodon06", hostnames.second());
+        Assert.assertEquals("gollum05", hostnames.first());
+        Assert.assertEquals("gollum06", hostnames.second());
     }
 }
