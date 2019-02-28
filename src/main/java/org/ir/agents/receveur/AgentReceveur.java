@@ -60,6 +60,7 @@ public class AgentReceveur {
 
             } catch (IOException e) {
                 System.err.println("Fermeture du socket sur erreur");
+                e.printStackTrace();
                 if (socket != null) {
                     try {
                         socket.close();
