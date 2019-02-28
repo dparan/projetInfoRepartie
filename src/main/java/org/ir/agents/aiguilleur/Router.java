@@ -83,8 +83,8 @@ public class Router implements Runnable {
         // Si on est un poste receveur
         if (hostname.equals(NAME + "01") || hostname.equals(NAME + "02")) {
             LOGGER.info("Sending to message to local receiver...");
-            sendToLocalReceiver(message);
-    
+            handleLocalReceiver(message);
+
         } else {
             LOGGER.info("Asking next nodes for pheromons values .. ");
 
@@ -138,10 +138,16 @@ public class Router implements Runnable {
             return nextHostnames.second();
     }
 
-    private void sendToLocalReceiver(String message) throws IOException {
+    private void handleLocalReceiver(String message) throws IOException {
         Socket agentRecepteur = new Socket(hostname, RECEIVER_PORT);
+
         PrintWriter writer = new PrintWriter(agentRecepteur.getOutputStream(), true);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(agentRecepteur.getInputStream()));
+
         writer.println(message);
+
+        String received = reader.readLine();
+        handleAscendingMessage(received, received.split("-")[1]);
     }
 
     private void handleAscendingMessage(String message, String id) throws IOException {
