@@ -30,10 +30,10 @@ public class Pair<T> implements Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new PairIterator<>(this);
+        return new PairIterator(this);
     }
 
-    class PairIterator<T> implements Iterator<T> {
+    class PairIterator implements Iterator<T> {
         private Pair<T> pair;
         private int cpt;
 
