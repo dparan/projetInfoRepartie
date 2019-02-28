@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class AgentReceveur {
 
-    private static final String PATH = "D:/ProjetM1";
+    private static final String PATH = "/media/Donnees/ProjetM1";
     private static Runnable serveur = new Runnable() {
 
         /**
@@ -18,23 +18,29 @@ public class AgentReceveur {
          * @param socket le socket de communication
          */
         private void handling(ServerSocket socket) throws IOException {
+            System.out.println("création du receveur");
+            Receveur r = new Receveur();
             while (true) {
-                Receveur r = new Receveur();
                 Socket socketClient = socket.accept();
                 PrintWriter out = new PrintWriter(socketClient.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
                 //  récupération du message 
                 String str = in.readLine();
                 String str_arr[] = str.split("-");
+                System.out.println("message reçu, id :" + str_arr[1] + " direction :" + str_arr[0] + " contenu :" + str_arr[2]);
                 switch (str_arr[2]) {
                 case "text":
                     // récupération et envoit du contenu d'un fichier texte
+                    System.out.println("Remplissage du tableau");
                     r.remplirTableau(PATH);
+                    System.out.println("Réussi");
                     out.println(new Message(str_arr[1], r.getTextFile(r.getRandomElement()), 1));
                     break;
                 case "image":
                     // récupération et envoit du contenu d'un fichier imagex
+                    System.out.println("Remplissage du tableau");
                     r.remplirTableau(PATH);
+                    System.out.println("Réussi");
                     out.println(new Message(str_arr[1], r.getImageFile(r.getRandomElement()), 1));
                     break;
                 default:
