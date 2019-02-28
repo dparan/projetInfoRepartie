@@ -30,7 +30,6 @@ public class Router implements Runnable {
 
     private String senderHostname;
     private BufferedReader in;
-    private PrintWriter out;
 
     static {
         try {
@@ -46,7 +45,6 @@ public class Router implements Runnable {
     Router(Socket sender) throws IOException {
         senderHostname = sender.getInetAddress().getHostName();
         in = new BufferedReader(new InputStreamReader(sender.getInputStream()));
-        out = new PrintWriter(sender.getOutputStream(), true);
 
         LOGGER.log(Level.INFO, "New connection from {0}", senderHostname);
     }
@@ -123,11 +121,13 @@ public class Router implements Runnable {
 
 
             String nextHostname = pickNextHostname(pheros);
-
             LOGGER.log(Level.INFO, "Next node picked : {0}", nextHostname);
+
             Socket socket = new Socket(nextHostname, ListenServer.PORT);
+
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             writer.println(message);
+
             socket.close();
         }
     }
@@ -155,15 +155,37 @@ public class Router implements Runnable {
         String received = reader.readLine();
         LOGGER.info("Received message from local receiver..");
         handleAscendingMessage(received, received.split("-")[1]);
+
         agentRecepteur.close();
     }
 
     private void handleAscendingMessage(String message, String id) throws IOException {
         LOGGER.info("Ascending message.");
 
+        sendLocalIncrement(message);
+
+        // On recupere l'hostname du destinataire
+        String receiverHostname = routes.get(id);
+        LOGGER.log(Level.INFO, "Sending ascending message to {0}.", receiverHostname);
+
+        Socket receiver;
+
+        // Si la route pointe sur localhost -> on envoi la réponse au lanceur
+        if (InetAddress.getLocalHost().getHostName().equals(receiverHostname))
+            receiver = new Socket(receiverHostname, LAUNCHER_PORT);
+        else // Sinon on remonte au prochain aiguilleur
+            receiver = new Socket(receiverHostname, ListenServer.PORT);
+
+        PrintWriter writer = new PrintWriter(receiver.getOutputStream(), true);
+        writer.println(message);
+
+        receiver.close();
+    }
+
+    private void sendLocalIncrement(String message) throws IOException {
         Socket socket = new Socket(hostname, COUNTER_PORT);
         PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-        
+
         // On incremente le compteur du noeud (courant)
         if (message.contains("image")) {
             writer.println("I+");
@@ -174,18 +196,6 @@ public class Router implements Runnable {
             LOGGER.log(Level.INFO, "Sending increment message to local counter agent.");
         }
 
-        // On recupere l'hostname du destinataire
-        String receiverHostname = routes.get(id);
-        LOGGER.log(Level.INFO, "Sending ascending message to {0}.", receiverHostname);
-
-        // Si on ne trouve pas d'hostname dans les routes, cela veut dire qu'on est certainement le destinataire du message
-        if ("localhost".equals(receiverHostname))
-            // writer = new PrintWriter(new Socket(hostname, LAUNCHER_PORT).getOutputStream(), true);
-            writer = out;
-        else
-            writer = new PrintWriter(new Socket(receiverHostname, ListenServer.PORT).getOutputStream(), true);
-
-        writer.println(message);
         socket.close();
     }
 }
