@@ -72,15 +72,15 @@ public class App implements ActionListener {
             } else if (file.getAbsolutePath().endsWith(".txt")) {
 
                 JFrame dialog = new JFrame("texte");
-                JTextArea textArea = new JTextArea(30, 30);
+                JTextArea textArea = new JTextArea(150, 150);
+                textArea.setLineWrap(true);
 
                 JScrollPane scrollPane = new JScrollPane(textArea);
                 scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+                scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-                String text = readTextFromFile(file);
-                if (text != null || text.isEmpty()) text = "text is empty/null..";
-                textArea.setText(text);
+                List<String> text = readTextFromFile(file);
+                text.forEach((s) -> textArea.append(s + '\n'));
 
                 dialog.add(scrollPane);
                 dialog.pack();
@@ -98,12 +98,11 @@ public class App implements ActionListener {
         }
     }
 
-    private String readTextFromFile(File file) {
+    private List<String> readTextFromFile(File file) {
         try {
             String filename = file.getAbsolutePath();
             Path path = Paths.get(filename);
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            return String.join("", lines);
+            return Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOGGER.severe(e.getMessage());
         }
