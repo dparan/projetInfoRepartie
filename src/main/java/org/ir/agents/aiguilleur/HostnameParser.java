@@ -2,7 +2,7 @@ package org.ir.agents.aiguilleur;
 
 public class HostnameParser {
 
-    public static final String NAME = "gollum";
+    public static final String NAME = "pixel";
 
     private HostnameParser() {}
 
@@ -18,6 +18,8 @@ public class HostnameParser {
     }
 
     private static String findNextHostname(int nextNumber) {
+        if (nextNumber < 1) nextNumber = 1;
+        
         String next = NAME;
         if (nextNumber < 10)
             next += "0";
