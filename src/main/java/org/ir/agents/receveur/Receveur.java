@@ -10,10 +10,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Receveur {
+
+    private static final Logger LOGGER = Logger.getLogger("Receveur");
 
     static ArrayList<Path> tableau = new ArrayList<>();
     static int i;
@@ -25,10 +28,13 @@ public class Receveur {
      */
     public void remplirTableau(String chemin) throws IOException {
         // on ne remplit le tableau qu'une fois
+        LOGGER.info("Recherche du fichier dans : " + chemin);
+
         if (tableau.isEmpty()) {
             // remplissage du tableau avec les fichiers
             Files.find(Paths.get(chemin), Integer.MAX_VALUE,(path,fileAttr) -> fileAttr.isRegularFile()).forEach((Path el) -> {
                 if (!el.endsWith(".DS_Store")) {
+                    LOGGER.info("Ajout du fichier : " + el.getFileName());
                     tableau.add(el);
                 }
             });
@@ -54,20 +60,25 @@ public class Receveur {
      * 
      * @param chemin le chemin du fichier à retourner
      */
-    public String getTextFile(String chemin) throws IOException {
-        if (chemin.endsWith(".zip")) {
-            ZipFile zipFile = new ZipFile(chemin);
-            for (Enumeration<? extends ZipEntry> e = zipFile.entries(); e.hasMoreElements();) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
-                if (!entry.isDirectory()) {
-                    StringBuilder stringBuilder = getTxtFiles(zipFile.getInputStream(entry));
-                    zipFile.close();
-                    // encode en base 64 l'image et retourne la chaîne
-                    return Base64.getEncoder().encodeToString(stringBuilder.toString().getBytes());
-                }
+    public String getTextFile() throws IOException {
+        if (!zipExists()) return "notFound";
+
+        String chemin = getRandomElement();
+        while (!chemin.endsWith(".zip"))
+            chemin = getRandomElement();
+
+        ZipFile zipFile = new ZipFile(chemin);
+        for (Enumeration<? extends ZipEntry> e = zipFile.entries(); e.hasMoreElements();) {
+            ZipEntry entry = (ZipEntry) e.nextElement();
+            if (!entry.isDirectory()) {
+                StringBuilder stringBuilder = getTxtFiles(zipFile.getInputStream(entry));
+                zipFile.close();
+                // encode en base 64 l'image et retourne la chaîne
+                return Base64.getEncoder().encodeToString(stringBuilder.toString().getBytes());
             }
-            zipFile.close();
         }
+        zipFile.close();
+
         return "notFound";
     }
 
@@ -76,22 +87,42 @@ public class Receveur {
      * 
      * @param chemin le chemin du fichier à retourner
      */
-    public String getImageFile(String chemin) throws IOException {
-    	if(chemin.endsWith(".jpg")) {
-        	// récuperation de tous les bits du fichier 
-        	byte[] fileContent = Files.readAllBytes(Paths.get(chemin));
-        	// encode en base 64 l'image et retourne la chaîne
-        	return Base64.getEncoder().encodeToString(fileContent);
-		}
-		return "notFound";
+    public String getImageFile() throws IOException {
+        if (!imageExists()) return "notFound";
+
+        String chemin = getRandomElement();
+        while (!chemin.endsWith(".jpg") && !chemin.endsWith(".jpeg"))
+            chemin = getRandomElement();
+
+    	// récuperation de tous les bits du fichier 
+        byte[] fileContent = Files.readAllBytes(Paths.get(chemin));
+        // encode en base 64 l'image et retourne la chaîne
+        return Base64.getEncoder().encodeToString(fileContent);
+
     }
 
-    /**
-     * Récupération d'un élément aléatoire dans le tableau
-     * 
-     */
-    public String getRandomElement() {
+    private String getRandomElement() {
         int i = (int) (Math.random() * tableau.size());
         return tableau.get(i).toString();
+    }
+
+    private boolean imageExists() {
+        for (Path p : tableau) {
+            String chemin = p.toString();
+            if (chemin.endsWith(".jpg") || chemin.endsWith(".jpeg")) 
+                return true;
+        }
+
+        return false;
+    }
+
+    private boolean zipExists() {
+        for (Path p : tableau) {
+            String chemin = p.toString();
+            if (chemin.endsWith(".zip")) 
+                return true;
+        }
+
+        return false;
     }
 }

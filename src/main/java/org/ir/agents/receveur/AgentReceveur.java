@@ -36,14 +36,14 @@ public class AgentReceveur {
                     // récupération et envoit du contenu d'un fichier texte
                     r.remplirTableau(PATH);
                     Message textMessage = new Message(str_arr[1], str_arr[2], 1);
-                    textMessage.setValue(r.getTextFile(r.getRandomElement()));
+                    textMessage.setValue(r.getTextFile());
                     out.println(textMessage);
                     break;
                 case "image":
                     // récupération et envoit du contenu d'un fichier imagex
                     r.remplirTableau(PATH);
                     Message imageMessage = new Message(str_arr[1], str_arr[2], 1);
-                    imageMessage.setValue(r.getImageFile(r.getRandomElement()));
+                    imageMessage.setValue(r.getImageFile());
                     out.println(imageMessage);
                     break;
                 default:
